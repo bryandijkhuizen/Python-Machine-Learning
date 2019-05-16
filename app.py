@@ -1,5 +1,10 @@
 import quandl as q
 import pandas as pd
+import math
+import numpy as np
+from sklearn import preprocessing, svm
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 #df = dataframe
 
@@ -14,6 +19,31 @@ forecast_col = 'Adj. Close'
 df.fillna(-99999, inplace=True)
 
 #fills the empty data
+
+forecast_out = int(math.ceil(0.1*len(df)))
+
+df['label'] = df[forecast_col].shift(-forecast_out)
+df.dropna(inplace=True)
+
+X = np.array(df.drop(['label'], 1))
+y = np.array(df['label'])
+
+X = preprocessing.scale(X)
+
+y = np.array(df['label'])
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+clf = svm.SVR(kernel='poly')
+clf.fit(X_train, y_train)
+accuracy = clf.score(X_test, y_test)
+
+print(forecast_out)
+print(accuracy)
+
+#X = Features
+#y = Labels
+
 
 
 
